@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  authdb:
+    build: authdb
+    init: true
+    user: mysql:mysql
+    volumes:
+      - dblord_mysql:/var/lib/mysql
+    networks:
+      backend:
+        ipv4_address: 10.42.0.3
+    restart: unless-stopped
+
+  auth:
+    build: auth
+    init: true
+    ports:
+      - 5300:53/udp
+      - 5300:53/tcp
+    depends_on:
+      - authdb
+    networks:
+      backend:
+        ipv4_address: 10.42.0.254  # must match A record at ns{1,2}.bench.pqdnssec.dedyn.io.
+    restart: unless-stopped
+
+  recursor:
+    build: recursor
+    init: true
+    ports:
+      - 5301:53/udp
+      - 5301:52/tcp
+    networks:
+      backend:
+        ipv4_address: 10.42.0.2
+    restart: unless-stopped
+
+volumes:
+  dblord_mysql:
+
+networks:
+  backend:
+    ipam:
+      config:
+        - subnet: 10.42.0.0/24

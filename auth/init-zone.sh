@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+Z=bench.pqdnssec.dedyn.io.
+KEYFILE=bench.pqdnssec.dedyn.io.key
+
+# Private key for bench.pqdnssec.dedyn.io.
+# This is fixed as it needs to match the DS record at bench.pqdnssec.dedyn.io.
+cat <<EOF > $KEYFILE
+Private-key-format: v1.2
+Algorithm: 13 (ECDSAP256SHA256)
+PrivateKey: mouoVSBnugql4E7ka/vxGMXrFZrOTTKgrPbAZ82rqmo=
+EOF
+
+# zones
+pdnsutil create-zone $Z
+pdnsutil create-zone baseline.$Z
+pdnsutil create-zone falcon.$Z
+
+# keys
+pdnsutil import-zone-key $Z $KEYFILE KSK
+pdnsutil add-zone-key baseline.$Z KSK active 356 ed448
+pdnsutil add-zone-key falcon.$Z KSK active 356 ed448  # TODO use falcon
+sleep 2
+
+# zone content
+pdnsutil add-record $Z @ A 1.1.1.1
+pdnsutil add-record $Z @ TXT foobar
+pdnsutil add-record $Z @ NS ns{1,2}.pqdnssec.dedyn.io.
+pdnsutil add-record $Z baseline NS ns{1,2}.pqdnssec.dedyn.io.
+pdnsutil add-record $Z falcon NS ns{1,2}.pqdnssec.dedyn.io.
+
+pdnsutil add-record baseline.$Z @ NS ns{1,2}.pqdnssec.dedyn.io.
+pdnsutil add-record baseline.$Z @ DS "$(pdnsutil export-zone-ds baseline.bench.pqdnssec.dedyn.io. | grep SHA256 | grep -Eo '[0-9abcdef ]{16,256}')"
+
+pdnsutil add-record falcon.$Z @ NS ns{1,2}.pqdnssec.dedyn.io.
+pdnsutil add-record falcon.$Z @ DS "$(pdnsutil export-zone-ds falcon.bench.pqdnssec.dedyn.io. | grep SHA256 | grep -Eo '[0-9abcdef ]{16,256}')"
+
+# finish DNSSEC setup
+pdnsutil rectify-zone $Z
+pdnsutil rectify-zone baseline.$Z
+pdnsutil rectify-zone falcon.$Z
