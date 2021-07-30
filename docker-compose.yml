@@ -13,24 +13,33 @@ services:
     restart: unless-stopped
 
   auth:
-    build: auth
+    build:
+      context: pdns
+      dockerfile: Dockerfile-auth
     init: true
     ports:
       - 5300:53/udp
       - 5300:53/tcp
     depends_on:
       - authdb
+    volumes:
+      - ./auth/pdns.conf:/etc/powerdns/pdns.conf
+      - ./auth/init-zones:/usr/local/bin/init-zones
     networks:
       backend:
         ipv4_address: 10.42.0.254  # must match A record at ns{1,2}.bench.pqdnssec.dedyn.io.
     restart: unless-stopped
 
   recursor:
-    build: recursor
+    build:
+      context: pdns
+      dockerfile: Dockerfile-recursor
     init: true
     ports:
       - 5301:53/udp
       - 5301:52/tcp
+    volumes:
+      - ./recursor/recursor.conf:/etc/powerdns/recursor.conf
     networks:
       backend:
         ipv4_address: 10.42.0.2

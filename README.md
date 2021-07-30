@@ -27,7 +27,7 @@ After the system is started and ready to use, use the [included script](auth/ini
 with DNS information:
 
 ```shell
-docker-compose exec auth bash /root/init-zone.sh
+docker-compose exec auth bash init-zones
 ```
 
 The authoritative name server is equipped with a zone under the name of `bench.pqdnssec.dedyn.io`.

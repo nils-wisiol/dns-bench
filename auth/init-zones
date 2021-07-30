@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 Z=bench.pqdnssec.dedyn.io.
-KEYFILE=bench.pqdnssec.dedyn.io.key
+KEYFILE=/tmp/bench.pqdnssec.dedyn.io.key
 
 # Private key for bench.pqdnssec.dedyn.io.
 # This is fixed as it needs to match the DS record at bench.pqdnssec.dedyn.io.
