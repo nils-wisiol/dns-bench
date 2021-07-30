@@ -37,7 +37,7 @@ services:
     init: true
     ports:
       - 5301:53/udp
-      - 5301:52/tcp
+      - 5301:53/tcp
     volumes:
       - ./recursor/recursor.conf:/etc/powerdns/recursor.conf
     networks:
