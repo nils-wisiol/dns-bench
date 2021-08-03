@@ -2,7 +2,8 @@
 
 This repository contains a authoritative name server and a validating resolver and can be used to study resolver
 behavior for names under `bench.pqdnssec.dedyn.io`.
-
+The resolver and autorithative name server are based on a PowerDNS fork using an OpenSSL fork to support PQ-Algorithms.
+Both rely on two pre-built images from DockerHub, which can be found under the following link: https://hub.docker.com/repository/docker/gothremote/pdns-auth and https://hub.docker.com/repository/docker/gothremote/pdns-recursor.
 
 ## Getting Started
 
@@ -32,12 +33,12 @@ docker-compose exec auth bash init-zones
 
 The authoritative name server is equipped with a zone under the name of `bench.pqdnssec.dedyn.io`.
 As the DS record for this zone is hosted upstream by desec.io, the private key is part of this repository.
-There are two additional zones which are delegated appropriately: `baseline.bench.pqdnssec.dedyn.io` and
-`falcon.bench.pqdnssec.dedyn.io`.
-While the latter is intended to use the Falcon signature scheme later, both currently use ed448.
-
-TODO: Upgrade to actually use Falcon.
-
+There are three additional zones which are delegated appropriately: `oldfashion.bench.pqdnssec.dedyn.io`, `baseline.bench.pqdnssec.dedyn.io` and `falcon.bench.pqdnssec.dedyn.io`.
+The latter is using the Falcon512 signature scheme.
+In order for the changes to take effect restart the containers using:
+```shell
+docker-compose restart
+```
 Data served by the authoritative name server is kept across restarts, unless the database volume is deleted.
 
 TODO: Add info on how to add broken DNSSEC, add info on how to use different algorithm.
@@ -49,7 +50,6 @@ The usual pdns CLI can be used, e.g., to set an additional A record at the zone 
 ```shell
 docker-compose exec auth pdnsutil add-record $Z @ A 9.9.9.9
 ```
-
 
 ## Send Queries
 
