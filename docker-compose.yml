@@ -13,9 +13,7 @@ services:
     restart: unless-stopped
 
   auth:
-    build:
-      context: pdns
-      dockerfile: Dockerfile-auth
+    image: gothremote/pdns-auth:latest
     init: true
     ports:
       - 5300:53/udp
@@ -31,9 +29,7 @@ services:
     restart: unless-stopped
 
   recursor:
-    build:
-      context: pdns
-      dockerfile: Dockerfile-recursor
+    image: gothremote/pdns-recursor:latest
     init: true
     ports:
       - 5301:53/udp

@@ -13,20 +13,26 @@ EOF
 
 # zones
 pdnsutil create-zone $Z
+pdnsutil create-zone oldfashion.$Z
 pdnsutil create-zone baseline.$Z
 pdnsutil create-zone falcon.$Z
 
 # keys
 pdnsutil import-zone-key $Z $KEYFILE KSK
-pdnsutil add-zone-key baseline.$Z KSK active 356 ed448
-pdnsutil add-zone-key falcon.$Z KSK active 356 ed448  # TODO use falcon
+pdnsutil add-zone-key oldfashion.$Z KSK active 2048 rsasha512
+pdnsutil add-zone-key baseline.$Z KSK active 456 ed448
+pdnsutil add-zone-key falcon.$Z KSK active 10248 falcon
 
 # zone content
 pdnsutil add-record $Z @ A 1.1.1.1
 pdnsutil add-record $Z @ TXT foobar
 pdnsutil add-record $Z @ NS ns{1,2}.pqdnssec.dedyn.io.
+pdnsutil add-record $Z oldfashion NS ns{1,2}.pqdnssec.dedyn.io.
 pdnsutil add-record $Z baseline NS ns{1,2}.pqdnssec.dedyn.io.
 pdnsutil add-record $Z falcon NS ns{1,2}.pqdnssec.dedyn.io.
+
+pdnsutil add-record oldfashion.$Z @ NS ns{1,2}.pqdnssec.dedyn.io.
+pdnsutil add-record oldfashion.$Z @ DS "$(pdnsutil export-zone-ds oldfashion.bench.pqdnssec.dedyn.io. | grep SHA256 | grep -Eo '[0-9abcdef ]{16,256}')"
 
 pdnsutil add-record baseline.$Z @ NS ns{1,2}.pqdnssec.dedyn.io.
 pdnsutil add-record baseline.$Z @ DS "$(pdnsutil export-zone-ds baseline.bench.pqdnssec.dedyn.io. | grep SHA256 | grep -Eo '[0-9abcdef ]{16,256}')"
@@ -36,5 +42,6 @@ pdnsutil add-record falcon.$Z @ DS "$(pdnsutil export-zone-ds falcon.bench.pqdns
 
 # finish DNSSEC setup
 pdnsutil rectify-zone $Z
+pdnsutil rectify-zone oldfashion.$Z
 pdnsutil rectify-zone baseline.$Z
 pdnsutil rectify-zone falcon.$Z
