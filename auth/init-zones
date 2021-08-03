@@ -20,8 +20,8 @@ pdnsutil create-zone falcon.$Z
 # keys
 pdnsutil import-zone-key $Z $KEYFILE KSK
 pdnsutil add-zone-key oldfashion.$Z KSK active 2048 rsasha512
-pdnsutil add-zone-key baseline.$Z KSK active 356 ed448
-pdnsutil add-zone-key falcon.$Z KSK active 1282 falcon
+pdnsutil add-zone-key baseline.$Z KSK active 456 ed448
+pdnsutil add-zone-key falcon.$Z KSK active 10248 falcon
 
 # zone content
 pdnsutil add-record $Z @ A 1.1.1.1
